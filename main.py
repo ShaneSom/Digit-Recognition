@@ -13,4 +13,21 @@ hiddenWeights = np.random.uniform(-0.5,0.5,(10,20))
 inputBias = np.zeros((20,1))
 hiddenBias = np.zeros((10,1))
 
+# Rate of learning
+rol = 0.01
+
+# How many times the training data is ran through the net
+epochs = 1
+
+for epoch in range(epochs):
+    for img, l in zip(img,lbl):
+        # Reshapes vectors into matrix of 1 col
+        img.shape += (1,)
+        l.shape += (1,)
+
+    # Forward propagation bias + weight @ img for input weights
+    inputPropagation = inputBias + inputWeights @ img
+    inputProp = 1/(1+np.exp(-inputPropagation))
+
+
 
