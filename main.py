@@ -13,5 +13,4 @@ hiddenWeights = np.random.uniform(-0.5,0.5,(10,20))
 inputBias = np.zeros((20,1))
 hiddenBias = np.zeros((10,1))
 
-print("WORKING")
 
