@@ -1,33 +1,48 @@
+from mnist import getMnist
 import numpy as np
 import matplotlib.pyplot as plt
-import mnist as mn
 
-# GETS MNIST DATASET TO TRAIN NUERAL NET MODEL
-img, lbl = mn.getMnist()
 
-# Matrix for Weights randomly distributed
-# 20 "Neurons" X 784 pixels
-inputWeights = np.random.uniform(-0.5,0.5, (20,784))
-hiddenWeights = np.random.uniform(-0.5,0.5,(10,20))
-# Matrix for Biases Starts at 0 then trains model 
-inputBias = np.zeros((20,1))
-hiddenBias = np.zeros((10,1))
+"""
+w = weights, b = bias, i = input, h = hidden, o = output, l = label
+e.g. w_i_h = weights from input layer to hidden layer
+"""
+img, lbl = getMnist()
+wInpToHidden = np.random.uniform(-0.5, 0.5, (20, 784))
+wHiddenToOut = np.random.uniform(-0.5, 0.5, (10, 20))
+bInpToHidden = np.zeros((20, 1))
+bHiddenToOut = np.zeros((10, 1))
 
-# Rate of learning
 rol = 0.01
-
-# How many times the training data is ran through the net
-epochs = 1
-
+numCorrect = 0
+epochs = 3
 for epoch in range(epochs):
-    for img, l in zip(img,lbl):
-        # Reshapes vectors into matrix of 1 col
+    for img, l in zip(img, lbl):
         img.shape += (1,)
         l.shape += (1,)
 
-    # Forward propagation bias + weight @ img for input weights
-    inputPropagation = inputBias + inputWeights @ img
-    inputProp = 1/(1+np.exp(-inputPropagation))
+        # Forward propagation
+        inpToHidden = bInpToHidden + wInpToHidden @ img
+        hidden = 1 / (1 + np.exp(-inpToHidden))
 
+        hiddenToOut = bHiddenToOut + wHiddenToOut @ hidden
+        out = 1 / (1 + np.exp(-hiddenToOut))
+
+        # Error calculation
+        e = 1 / len(out) * np.sum((out - l) ** 2, axis=0)
+        numCorrect += int(np.argmax(out) == np.argmax(l))
+
+        # Backpropagation output
+        delta_o = out - l
+        wHiddenToOut += -rol * delta_o @ np.transpose(hidden)
+        bHiddenToOut += -rol * delta_o
+        
+        delta_h = np.transpose(wHiddenToOut) @ delta_o * (hidden * (1 - hidden))
+        wInpToHidden += -rol * delta_h @ np.transpose(img)
+        bInpToHidden += -rol * delta_h
+
+    # Show accuracy for this epoch
+    print(f"Accuracy: {round((numCorrect / img.shape[0]) * 100, 2)}%")
+    numCorrect = 0
 
 
